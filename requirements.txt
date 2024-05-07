@@ -1,0 +1,6 @@
+scikit-learn
+scikit-image
+numpy
+flwr
+tensorflow
+tensorflow-datasets
