@@ -11,7 +11,7 @@ for phy_dev in physical_devices:
 
 TESTING    = False
 TRAIN_SIZE = 0.8
-HOST       = "192.168.0.37"
+HOST       = "192.168.0.39"
 PORT       = "7517"
 
 class FlowerClient(fl.client.NumPyClient):
@@ -60,6 +60,11 @@ def gen_resnet50_model():
   model = tf.keras.applications.resnet.ResNet50(input_tensor=inputs, classes=8, weights=None)
   return tf.keras.Model(inputs, model.output), model
 
+def gen_effnetb0_model():
+  inputs = tf.keras.Input((150,150,3))
+  model = tf.keras.applications.EfficientNetB0(input_tensor=inputs, classes=8, weights=None)
+  return tf.keras.Model(inputs, model.output), model
+
 def load_images_from_directory(directory):
     images = []
     labels = []
@@ -91,8 +96,9 @@ if TESTING:
 x_train, x_test, y_train, y_test = train_test_split(features, labels, train_size=TRAIN_SIZE, random_state=7585)
 print("Finished Reading Data!")
 
-model, rn50 = gen_resnet50_model()
-model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
+#model, base_model = gen_resnet50_model()
+model, base_model = gen_effnetb0_model()
+model.compile(optimizer=tf.keras.optimizers.RMSprop(0.001),
                              loss="categorical_crossentropy",
                              metrics=["accuracy",
                                       tf.keras.metrics.AUC(),
@@ -101,5 +107,5 @@ model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
 # Starting Client
 
 print("Starting client...\n\n")
-fl.client.start_numpy_client(server_address=f"{HOST}:{PORT}", client=FlowerClient(x_train, y_train, x_test, y_test, model, rn50))
+fl.client.start_numpy_client(server_address=f"{HOST}:{PORT}", client=FlowerClient(x_train, y_train, x_test, y_test, model, base_model))
 print("\n\nTraining Done!")

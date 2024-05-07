@@ -7,7 +7,7 @@ from datetime import datetime
 
 HOST                  = "192.168.0.39"
 PORT                  = "7517"
-GLOBAL_EPOCHS         = 3
+GLOBAL_EPOCHS         = 10
 VERBOSE               = 1
 OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE-3-CLIENTES-FULL-Maeve_e_cisco"
 FRACTION_FIT          = 1
@@ -15,7 +15,7 @@ FRACTION_EVALUATE     = 1
 MIN_FIT_CLIENTS       = 3
 MIN_EVALUATE_CLIENTS  = 3
 MIN_AVAILABLE_CLIENTS = 3
-DECAY_ROUNDS          = []
+DECAY_ROUNDS          = [5, 8, 9]
 DECAY_FACTOR          = 0.9
 
 if os.path.exists(os.path.join(os.curdir, "LOGS", OUTPUT_DIR)):
