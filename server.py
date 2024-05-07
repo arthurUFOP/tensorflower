@@ -7,15 +7,15 @@ from datetime import datetime
 
 HOST                  = "192.168.0.39"
 PORT                  = "7517"
-GLOBAL_EPOCHS         = 6
+GLOBAL_EPOCHS         = 3
 VERBOSE               = 1
-OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE-3-CLIENTES-FULL"
+OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE-3-CLIENTES-FULL-Maeve_e_cisco"
 FRACTION_FIT          = 1
 FRACTION_EVALUATE     = 1
 MIN_FIT_CLIENTS       = 3
 MIN_EVALUATE_CLIENTS  = 3
 MIN_AVAILABLE_CLIENTS = 3
-DECAY_ROUNDS          = [3, 5]
+DECAY_ROUNDS          = []
 DECAY_FACTOR          = 0.9
 
 if os.path.exists(os.path.join(os.curdir, "LOGS", OUTPUT_DIR)):
@@ -93,8 +93,7 @@ with open(os.path.join(os.curdir, "LOGS", OUTPUT_DIR, "config.log"), "w+") as f:
             MIN_FIT_CLIENTS       = {MIN_FIT_CLIENTS      }
             MIN_EVALUATE_CLIENTS  = {MIN_EVALUATE_CLIENTS }
             MIN_AVAILABLE_CLIENTS = {MIN_AVAILABLE_CLIENTS}
-            DECAY_ROUND_1         = {DECAY_ROUND_1        }
-            DECAY_ROUND_2         = {DECAY_ROUND_2        }
+            DECAY_ROUNDS          = {DECAY_ROUNDS         }
             DECAY_FACTOR          = {DECAY_FACTOR         }
             """)
 
