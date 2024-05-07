@@ -5,18 +5,17 @@ import os
 import csv
 from datetime import datetime
 
-HOST                  = "127.0.0.1"
+HOST                  = "192.168.0.39"
 PORT                  = "7517"
 GLOBAL_EPOCHS         = 6
 VERBOSE               = 1
-OUTPUT_DIR            = "ColorretalExperimentLogs"
+OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE-3-CLIENTES-FULL"
 FRACTION_FIT          = 1
 FRACTION_EVALUATE     = 1
-MIN_FIT_CLIENTS       = 4
-MIN_EVALUATE_CLIENTS  = 4
-MIN_AVAILABLE_CLIENTS = 4
-DECAY_ROUND_1         = 1
-DECAY_ROUND_2         = 5
+MIN_FIT_CLIENTS       = 3
+MIN_EVALUATE_CLIENTS  = 3
+MIN_AVAILABLE_CLIENTS = 3
+DECAY_ROUNDS          = [3, 5]
 DECAY_FACTOR          = 0.9
 
 if os.path.exists(os.path.join(os.curdir, "LOGS", OUTPUT_DIR)):
@@ -39,7 +38,7 @@ def weighted_average(metrics):
              "recall": sum(recs) / sum(examples)}
 
 def fit_config(server_round):
-    decay = True if (server_round==DECAY_ROUND_1 or server_round==DECAY_ROUND_2) else False
+    decay = True if (server_round in DECAY_ROUNDS) else False
 
     config = {
         "lr_decay" : str(decay),
