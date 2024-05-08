@@ -98,7 +98,7 @@ print("Finished Reading Data!")
 
 #model, base_model = gen_resnet50_model()
 model, base_model = gen_effnetb0_model()
-model.compile(optimizer=tf.keras.optimizers.RMSprop(0.001),
+model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
                              loss="categorical_crossentropy",
                              metrics=["accuracy",
                                       tf.keras.metrics.AUC(),
