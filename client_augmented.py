@@ -4,6 +4,8 @@ import flwr as fl
 import os
 from sklearn.model_selection import train_test_split
 from skimage.io import imread
+from skimage import transform
+from random import shuffle
 
 TESTING    = False
 TRAIN_SIZE = 0.8
@@ -17,6 +19,7 @@ GPU_MEM_PER_CLIENT = 12000 # Measured in megabytes
 #gpus = tf.config.list_physical_devices('GPU')
 #tf.config.set_logical_device_configuration(gpus[0], [tf.config.LogicalDeviceConfiguration(memory_limit=GPU_MEM_PER_CLIENT)])
 
+# Dynamic Limit
 physical_devices = tf.config.list_physical_devices('GPU')
 for phy_dev in physical_devices:
   tf.config.experimental.set_memory_growth(phy_dev, True)
@@ -93,8 +96,43 @@ def load_images_from_directory(directory):
 
     return images, labels
 
-print("Reading Data...")
+def data_augmentation(images, labels):
+    augmented_images = []
+    augmented_labels = []
+    
+    for image, label in zip(images, labels):
+        augmented_images.append(image)
+        augmented_labels.append(label)
+        
+        # Horizontal Flip
+        augmented_images.append(np.fliplr(image))
+        augmented_labels.append(label)
 
+        # Vertical Flip
+        augmented_images.append(np.flipud(image))
+        augmented_labels.append(label)
+        
+        # Random Rotation
+        random_degree = np.random.uniform(-25, 25)
+        augmented_images.append(transform.rotate(image, random_degree, mode='edge'))
+        augmented_labels.append(label)
+        
+        # Random Translation
+        random_x = np.random.uniform(-10, 10)
+        random_y = np.random.uniform(-10, 10)
+        translation_matrix = np.array([[1, 0, random_x], [0, 1, random_y], [0, 0, 1]])
+        augmented_images.append(transform.warp(image, translation_matrix))
+        augmented_labels.append(label)
+    
+    # Shuffling data
+    combined = list(zip(augmented_images, augmented_labels))
+    shuffle(combined)
+    augmented_images[:], augmented_labels[:] = zip(*combined)
+    
+    return np.array(augmented_images), np.array(augmented_labels)
+
+# Reading Data
+print("Reading Data...")
 features, labels = load_images_from_directory("Kather_texture_2016_image_tiles_5000")
 
 if TESTING:
@@ -108,8 +146,12 @@ x_train, x_test, y_train, y_test = train_test_split(features, labels, train_size
 
 # 72% training, 8% val, 20% test (test is done on 'test_model.py')
 x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, train_size=0.9, random_state=14456)
-
 print("Finished Reading Data!")
+
+# Data Augmentation
+print("Augmenting Data...")
+x_train, y_train = data_augmentation(x_train, y_train)
+print("Finished Augmenting Data!")
 
 #model, base_model = gen_resnet50_model()
 model, base_model = gen_effnetb0_model()

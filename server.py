@@ -1,4 +1,5 @@
 import flwr as fl
+import numpy as np
 import tensorflow as tf
 import time
 import os
@@ -9,19 +10,35 @@ HOST                  = "192.168.0.39"
 PORT                  = "7517"
 GLOBAL_EPOCHS         = 20
 VERBOSE               = 1
-OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE-3-CLIENTES-FULL-Maeve_e_cisco-effnetb0-20glo-5local"
+OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE_3_CLIENTES-FULL-AUGMENTED-FedAvgM-20rounds_added_vflip"
 FRACTION_FIT          = 1
 FRACTION_EVALUATE     = 1
 MIN_FIT_CLIENTS       = 3
 MIN_EVALUATE_CLIENTS  = 3
 MIN_AVAILABLE_CLIENTS = 3
-DECAY_ROUNDS          = [10, 15, 18]
+DECAY_ROUNDS          = [8, 16, 19]
 DECAY_FACTOR          = 0.9
 
 if os.path.exists(os.path.join(os.curdir, "LOGS", OUTPUT_DIR)):
   print("ERROR: Output Dir Already Exists!")
   exit(1)
 os.mkdir(os.path.join(os.curdir, "LOGS", OUTPUT_DIR))
+
+class SaveModelFedAvg(fl.server.strategy.FedAvgM): # Can inherit from FedAvg, FedAdam, FedAvgM ... 
+    def aggregate_fit(self, server_round, results, failures):
+
+        # Call aggregate_fit from base class (FedAvg) to aggregate parameters and metrics
+        aggregated_parameters, aggregated_metrics = super().aggregate_fit(server_round, results, failures)
+
+        if aggregated_parameters is not None:
+            # Convert `Parameters` to `List[np.ndarray]`
+            aggregated_ndarrays = fl.common.parameters_to_ndarrays(aggregated_parameters)
+
+            # Save aggregated_ndarrays
+            print(f"Saving round {server_round} params at 'trained_model-round_{server_round}.npz' ...")
+            np.savez(os.path.join(os.curdir, "LOGS", OUTPUT_DIR, f"trained_model-round_{server_round}.npz"), *aggregated_ndarrays)
+
+        return aggregated_parameters, aggregated_metrics
 
 def weighted_average(metrics):
     # Multiply accuracy of each client by number of examples used
@@ -49,7 +66,7 @@ def fit_config(server_round):
 
     return config
 
-strategy = fl.server.strategy.FedAvg(
+strategy = SaveModelFedAvg(
     fraction_fit=FRACTION_FIT,
     fraction_evaluate=FRACTION_EVALUATE,
     min_fit_clients=MIN_FIT_CLIENTS,
