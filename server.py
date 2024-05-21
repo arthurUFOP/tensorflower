@@ -8,9 +8,9 @@ from datetime import datetime
 
 HOST                  = "192.168.0.39"
 PORT                  = "7517"
-GLOBAL_EPOCHS         = 20
+GLOBAL_EPOCHS         = 2
 VERBOSE               = 1
-OUTPUT_DIR            = "ActualReport-3_CLIENTS-SUBDIVIDED_DISJOINT-AUGMENTED-NO_KFOLD"
+OUTPUT_DIR            = "TEST-2-ActualReport-3_CLIENTS-SUBDIVIDED_DISJOINT-AUGMENTED-NO_KFOLD"
 FRACTION_FIT          = 1
 FRACTION_EVALUATE     = 1
 MIN_FIT_CLIENTS       = 3
