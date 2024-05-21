@@ -10,7 +10,7 @@ HOST                  = "192.168.0.39"
 PORT                  = "7517"
 GLOBAL_EPOCHS         = 20
 VERBOSE               = 1
-OUTPUT_DIR            = "ColorretalExperimentLogs-TESTE_3_CLIENTES-FULL-AUGMENTED-FedAvgM-20rounds_added_vflip"
+OUTPUT_DIR            = "ActualReport-3_CLIENTS-SUBDIVIDED_DISJOINT-AUGMENTED-NO_KFOLD"
 FRACTION_FIT          = 1
 FRACTION_EVALUATE     = 1
 MIN_FIT_CLIENTS       = 3
@@ -18,6 +18,7 @@ MIN_EVALUATE_CLIENTS  = 3
 MIN_AVAILABLE_CLIENTS = 3
 DECAY_ROUNDS          = [8, 16, 19]
 DECAY_FACTOR          = 0.9
+EXTRA_NOTES           = "Server On Maeve. 1 clients on nevasca, 1 clients on cisco, 1 on maeve"
 
 if os.path.exists(os.path.join(os.curdir, "LOGS", OUTPUT_DIR)):
   print("ERROR: Output Dir Already Exists!")
@@ -112,6 +113,7 @@ with open(os.path.join(os.curdir, "LOGS", OUTPUT_DIR, "config.log"), "w+") as f:
             MIN_AVAILABLE_CLIENTS = {MIN_AVAILABLE_CLIENTS}
             DECAY_ROUNDS          = {DECAY_ROUNDS         }
             DECAY_FACTOR          = {DECAY_FACTOR         }
+            EXTRA_NOTES           = {EXTRA_NOTES          }
             """)
 
 with open(os.path.join(os.curdir, "LOGS", OUTPUT_DIR, "execution.log"), "w+") as f:
