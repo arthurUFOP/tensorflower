@@ -75,12 +75,15 @@ def gen_effnetb0_model():
 def load_images_from_directory(directory):
     images = []
     labels = []
-    counter = -1
 
+    two_dots = True
     for subdir, _, files in os.walk(directory):
+        if two_dots:
+          two_dots = False
+          continue
+        label_index = int(subdir.split('/')[1].split('_')[0])-1
         lbl = np.zeros((8,), dtype=np.int64)
-        lbl[counter] = 1
-        counter+=1
+        lbl[label_index]=1
         for file in files:
             file_path = os.path.join(subdir, file)
             image = imread(file_path)

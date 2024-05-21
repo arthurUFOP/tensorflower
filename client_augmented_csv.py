@@ -2,10 +2,16 @@ import numpy as np
 import tensorflow as tf
 import flwr as fl
 import os
+import csv
+import sys
 from sklearn.model_selection import train_test_split
 from skimage.io import imread
 from skimage import transform
 from random import shuffle
+
+if len(sys.argv) != 3:
+    print(f"ERROR: Wrong usage!\nCorrect one: python3 {sys.argv[0]} 'train_file.csv' 'validation_file.csv' ")
+    exit(1)
 
 TESTING    = False
 TRAIN_SIZE = 0.8
@@ -75,25 +81,25 @@ def gen_effnetb0_model():
   model = tf.keras.applications.EfficientNetB0(input_tensor=inputs, classes=8, weights=None)
   return tf.keras.Model(inputs, model.output), model
 
-def load_images_from_directory(directory):
+def load_images_from_csv(csv_path):
     images = []
     labels = []
 
-    two_dots = True
-    for subdir, _, files in os.walk(directory):
-        if two_dots:
-          two_dots = False
-          continue
-        label_index = int(subdir.split('/')[1].split('_')[0])-1
-        lbl = np.zeros((8,), dtype=np.int64)
-        lbl[label_index]=1
-        for file in files:
-            file_path = os.path.join(subdir, file)
-            image = imread(file_path)
-            
-            images.append(image)
-            labels.append(lbl)
+    header = True
+    with open(csv_path) as f:
+      reader = csv.reader(f)
+      for row in reader:
 
+        if header:
+          header = False
+          continue
+        
+        images.append(imread(row[0])) # Feature
+
+        label = np.zeros((8,), dtype=np.int64) # Label
+        label[int(row[1])] = 1
+        labels.append(label)
+    
     images = np.array(images)
     labels = np.array(labels)
 
@@ -136,19 +142,10 @@ def data_augmentation(images, labels):
 
 # Reading Data
 print("Reading Data...")
-features, labels = load_images_from_directory("Kather_texture_2016_image_tiles_5000")
 
-if TESTING:
-  assert features.shape == (5000, 150, 150, 3)
-  assert labels.shape == (5000, 8)
+x_train, y_train = load_images_from_csv(sys.argv[1])
+x_test, y_test = load_images_from_csv(sys.argv[2])
 
-x_train, x_test, y_train, y_test = train_test_split(features, labels, train_size=TRAIN_SIZE, random_state=7585)
-
-# Server-Side evaluation method (aggregate metrics work on validation set)
-# Comment it out for client-side evaluation
-
-# 72% training, 8% val, 20% test (test is done on 'test_model.py')
-x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, train_size=0.9, random_state=14456)
 print("Finished Reading Data!")
 
 # Data Augmentation
