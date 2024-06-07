@@ -17,6 +17,7 @@ import flwr as fl
 import os
 import csv
 import sys
+import stainNorm_Macenko
 from sklearn.model_selection import train_test_split
 from skimage.io import imread
 from skimage import transform
@@ -117,6 +118,20 @@ x_test, y_test = load_images_from_csv(sys.argv[2])
 
 print("Finished Reading Data!")
 
+# Macenko normalization
+print("Starting Macenko Normalization...")
+
+normalizer = stainNorm_Macenko.Normalizer()
+normalizer.fit(x_train[0])
+
+def norm(img):
+  return normalizer.transform(img)
+
+x_train = norm(x_train)
+x_test = norm(x_test)
+
+print("Finished Macenko Normalization!")
+
 # Vision transformers stuff
 
 # HyperParams
@@ -144,8 +159,7 @@ data_augmentation = keras.Sequential(
     [
         layers.Normalization(),
         layers.Resizing(image_size, image_size),
-        layers.RandomFlip("horizontal_and_vertical"),
-        layers.RandomTranslation(height_factor=0.2, width_factor=0.2),
+        layers.RandomFlip("horizontal"),
         layers.RandomRotation(factor=0.02),
         layers.RandomZoom(height_factor=0.2, width_factor=0.2),
     ],
